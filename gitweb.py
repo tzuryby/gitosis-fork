@@ -32,10 +32,7 @@ from ConfigParser import NoSectionError, NoOptionError
 from gitosis import util
 
 def _escape_filename(s):
-    s = s.replace('\\', '\\\\')
-    s = s.replace('$', '\\$')
-    s = s.replace('"', '\\"')
-    return s
+    return s.replace('\\', '\\\\').replace('$', '\\$').replace('"', '\\"')
 
 def generate_project_list_fp(config, fp):
     """
@@ -79,9 +76,7 @@ def generate_project_list_fp(config, fp):
             if os.path.exists(os.path.join(repositories, namedotgit)):
                 name = namedotgit
             else:
-                log.warning(
-                    'Cannot find %(name)r in %(repositories)r'
-                    % dict(name=name, repositories=repositories))
+                log.warning('Cannot find %(name)r in %(repositories)r' % dict(name=name, repositories=repositories))
 
         response = [name]
         try:
@@ -114,7 +109,6 @@ def generate_project_list(config, path):
 
     os.rename(tmp, path)
 
-
 def set_descriptions(config):
     """
     Set descriptions for gitweb use.
@@ -146,16 +140,10 @@ def set_descriptions(config):
             if os.path.exists(os.path.join(repositories, namedotgit)):
                 name = namedotgit
             else:
-                log.warning(
-                    'Cannot find %(name)r in %(repositories)r'
-                    % dict(name=name, repositories=repositories))
+                log.warning('Cannot find %(name)r in %(repositories)r' % dict(name=name, repositories=repositories))
                 continue
 
-        path = os.path.join(
-            repositories,
-            name,
-            'description',
-            )
+        path = os.path.join(repositories, name, 'description')
         tmp = '%s.%d.tmp' % (path, os.getpid())
         f = file(tmp, 'w')
         try:

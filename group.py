@@ -22,20 +22,13 @@ def _getMembership(config, user, seen):
         # @all is the only group where membership needs to be
         # bootstrapped like this, anything else gets started from the
         # username itself
-        if (user in members
-            or '@all' in members):
-            log.debug('found %(user)r in %(group)r' % dict(
-                user=user,
-                group=group,
-                ))
+        if (user in members or '@all' in members):
+            log.debug('found %(user)r in %(group)r' % dict(user=user, group=group))
             seen.add(group)
             yield group
 
-            for member_of in _getMembership(
-                config, '@%s' % group, seen,
-                ):
+            for member_of in _getMembership(config, '@%s' % group, seen):
                 yield member_of
-
 
 def getMembership(config, user):
     """
@@ -52,4 +45,4 @@ def getMembership(config, user):
 
     # everyone is always a member of group "all"
     yield 'all'
-
+    

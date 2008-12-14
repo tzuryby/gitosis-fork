@@ -50,18 +50,9 @@ def fast_import(git_dir, commit_msg, committer, files, parent=None):
     """
     Create an initial commit.
     """
-    child = subprocess.Popen(
-        args=[
-            'git',
-            '--git-dir=.',
-            'fast-import',
-            '--quiet',
-            '--date-format=now',
-            ],
-        cwd=git_dir,
-        stdin=subprocess.PIPE,
-        close_fds=True,
-        )
+    child = subprocess.Popen(args=['git', '--git-dir=.', 'fast-import', '--quiet', '--date-format=now'],
+        cwd=git_dir, stdin=subprocess.PIPE, close_fds=True)
+        
     files = list(files)
     for index, (path, content) in enumerate(files):
         child.stdin.write("""\
@@ -69,28 +60,18 @@ blob
 mark :%(mark)d
 data %(len)d
 %(content)s
-""" % dict(
-            mark=index+1,
-            len=len(content),
-            content=content,
-            ))
+""" % dict(mark=index+1, len=len(content), content=content ))
+
     child.stdin.write("""\
 commit refs/heads/master
 committer %(committer)s now
 data %(commit_msg_len)d
 %(commit_msg)s
-""" % dict(
-            committer=committer,
-            commit_msg_len=len(commit_msg),
-            commit_msg=commit_msg,
-            ))
+""" % dict(committer=committer, commit_msg_len=len(commit_msg), commit_msg=commit_msg))
+
     if parent is not None:
         assert not parent.startswith(':')
-        child.stdin.write("""\
-from %(parent)s
-""" % dict(
-                parent=parent,
-                ))
+        child.stdin.write('from %(parent)s' % dict(parent=parent))
     for index, (path, content) in enumerate(files):
         child.stdin.write('M 100644 :%d %s\n' % (index+1, path))
     child.stdin.close()
@@ -117,15 +98,7 @@ def export(git_dir, path):
             pass
         else:
             raise
-    returncode = subprocess.call(
-        args=[
-            'git',
-            '--git-dir=%s' % git_dir,
-            'read-tree',
-            'HEAD',
-            ],
-        close_fds=True,
-        )
+    returncode = subprocess.call(args=['git', '--git-dir=%s' % git_dir, 'read-tree', 'HEAD'], close_fds=True)
     if returncode != 0:
         raise GitReadTreeError('exit status %d' % returncode)
     # jumping through hoops to be compatible with git versions
@@ -133,18 +106,8 @@ def export(git_dir, path):
     env = {}
     env.update(os.environ)
     env['GIT_WORK_TREE'] = '.'
-    returncode = subprocess.call(
-        args=[
-            'git',
-            '--git-dir=%s' % os.path.abspath(git_dir),
-            'checkout-index',
-            '-a',
-            '-f',
-            ],
-        cwd=path,
-        close_fds=True,
-        env=env,
-        )
+    returncode = subprocess.call(args=['git', '--git-dir=%s' % os.path.abspath(git_dir), 'checkout-index', '-a', '-f', ], cwd=path, close_fds=True, env=env)
+    
     if returncode != 0:
         raise GitCheckoutIndexError('exit status %d' % returncode)
 
@@ -155,17 +118,7 @@ class GitRevParseError(GitError):
     """rev-parse failed"""
 
 def has_initial_commit(git_dir):
-    child = subprocess.Popen(
-        args=[
-            'git',
-            '--git-dir=.',
-            'rev-parse',
-            'HEAD',
-            ],
-        cwd=git_dir,
-        stdout=subprocess.PIPE,
-        close_fds=True,
-        )
+    child = subprocess.Popen(args=['git', '--git-dir=.', 'rev-parse', 'HEAD'], cwd=git_dir, stdout=subprocess.PIPE, close_fds=True)
     got = child.stdout.read()
     returncode = child.wait()
     if returncode != 0:

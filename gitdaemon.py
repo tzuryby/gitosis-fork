@@ -41,10 +41,7 @@ def set_export_ok(config):
         global_enable = config.getboolean('gitosis', 'daemon')
     except (NoSectionError, NoOptionError):
         global_enable = False
-    log.debug(
-        'Global default is %r',
-        {True: 'allow', False: 'deny'}.get(global_enable),
-        )
+    log.debug('Global default is %r', {True: 'allow', False: 'deny'}.get(global_enable))
 
     def _error(e):
         if e.errno == errno.ENOENT:
@@ -52,15 +49,11 @@ def set_export_ok(config):
         else:
             raise e
 
-    for (dirpath, dirnames, filenames) \
-            in os.walk(repositories, onerror=_error):
+    for (dirpath, dirnames, filenames) in os.walk(repositories, onerror=_error):
         # oh how many times i have wished for os.walk to report
         # topdir and reldir separately, instead of dirpath
-        reldir = _extract_reldir(
-            topdir=repositories,
-            dirpath=dirpath,
-            )
-
+        reldir = _extract_reldir(topdir=repositories, dirpath=dirpath)
+        
         log.debug('Walking %r, seeing %r', reldir, dirnames)
 
         to_recurse = []

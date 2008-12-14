@@ -43,11 +43,7 @@ def initial_commit(git_dir, cfg, pubkey, user):
         git_dir=git_dir,
         commit_msg='Automatic creation of gitosis repository.',
         committer='Gitosis Admin <%s>' % user,
-        files=[
-            ('keydir/%s.pub' % user, pubkey),
-            ('gitosis.conf', cfg),
-            ],
-        )
+        files=[('keydir/%s.pub' % user, pubkey), ('gitosis.conf', cfg)])
 
 def symlink_config(git_dir):
     dst = os.path.expanduser('~/.gitosis.conf')
@@ -59,24 +55,13 @@ def symlink_config(git_dir):
             pass
         else:
             raise
-    os.symlink(
-        os.path.join(git_dir, 'gitosis.conf'),
-        tmp,
-        )
+    os.symlink(os.path.join(git_dir, 'gitosis.conf'), tmp)
     os.rename(tmp, dst)
 
-def init_admin_repository(
-    git_dir,
-    pubkey,
-    user,
-    ):
-    repository.init(
-        path=git_dir,
-        template=resource_filename('gitosis.templates', 'admin')
-        )
-    repository.init(
-        path=git_dir,
-        )
+def init_admin_repository(git_dir, pubkey, user):
+    repository.init(path=git_dir, template=resource_filename('gitosis.templates', 'admin'))
+    repository.init(path=git_dir)
+    
     if not repository.has_initial_commit(git_dir):
         log.info('Making initial commit...')
         # ConfigParser does not guarantee order, so jump through hoops
@@ -89,19 +74,13 @@ def init_admin_repository(
         cfg.set('group gitosis-admin', 'members', user)
         cfg.set('group gitosis-admin', 'writable', 'gitosis-admin')
         cfg.write(cfg_file)
-        initial_commit(
-            git_dir=git_dir,
-            cfg=cfg_file.getvalue(),
-            pubkey=pubkey,
-            user=user,
-            )
+        initial_commit(git_dir=git_dir, cfg=cfg_file.getvalue(), pubkey=pubkey, user=user)
 
 class Main(app.App):
     def create_parser(self):
         parser = super(Main, self).create_parser()
         parser.set_usage('%prog [OPTS]')
-        parser.set_description(
-            'Initialize a user account for use with gitosis')
+        parser.set_description('Initialize a user account for use with gitosis')
         return parser
 
     def read_config(self, *a, **kw):
@@ -130,11 +109,7 @@ class Main(app.App):
         repositories = util.getRepositoryDir(cfg)
         util.mkdir(repositories)
         admin_repository = os.path.join(repositories, 'gitosis-admin.git')
-        init_admin_repository(
-            git_dir=admin_repository,
-            pubkey=pubkey,
-            user=user,
-            )
+        init_admin_repository(git_dir=admin_repository, pubkey=pubkey, user=user)
         log.info('Running post-update hook...')
         util.mkdir(os.path.expanduser('~/.ssh'), 0700)
         run_hook.post_update(cfg=cfg, git_dir=admin_repository)

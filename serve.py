@@ -19,15 +19,9 @@ log = logging.getLogger('gitosis.serve')
 
 ALLOW_RE = re.compile("^'/*(?P<path>[a-zA-Z0-9][a-zA-Z0-9@._-]*(/[a-zA-Z0-9][a-zA-Z0-9@._-]*)*)'$")
 
-COMMANDS_READONLY = [
-    'git-upload-pack',
-    'git upload-pack',
-    ]
+COMMANDS_READONLY = ['git-upload-pack', 'git upload-pack']
 
-COMMANDS_WRITE = [
-    'git-receive-pack',
-    'git receive-pack',
-    ]
+COMMANDS_WRITE = ['git-receive-pack', 'git receive-pack']
 
 class ServingError(Exception):
     """Serving error"""
@@ -91,8 +85,7 @@ def serve(cfg, user, command):
         # misspelling
         newpath = access.haveAccess(config=cfg, user=user, mode='writeable', path=path)
         if newpath is not None:
-            log.warning('Repository %r config has typo "writeable", '
-                +'should be "writable"',path, )
+            log.warning('Repository %r config has typo "writeable", should be "writable"',path, )
 
     if newpath is None:
         # didn't have write access
@@ -107,8 +100,7 @@ def serve(cfg, user, command):
             raise WriteAccessDenied()
 
     (topdir, relpath) = newpath
-    assert not relpath.endswith('.git'), \
-           'git extension should have been stripped: %r' % relpath
+    assert not relpath.endswith('.git'), 'git extension should have been stripped: %r' % relpath
     repopath = '%s.git' % relpath
     fullpath = os.path.join(topdir, repopath)
     if (not os.path.exists(fullpath)
@@ -138,8 +130,7 @@ class Main(app.App):
     def create_parser(self):
         parser = super(Main, self).create_parser()
         parser.set_usage('%prog [OPTS] USER')
-        parser.set_description(
-            'Allow restricted git operations under DIR')
+        parser.set_description('Allow restricted git operations under DIR')
         return parser
 
     def handle_args(self, parser, cfg, options, args):

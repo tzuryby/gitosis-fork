@@ -42,13 +42,8 @@ class App(object):
 
     def create_parser(self):
         parser = optparse.OptionParser()
-        parser.set_defaults(
-            config=os.path.expanduser('~/.gitosis.conf'),
-            )
-        parser.add_option('--config',
-                          metavar='FILE',
-                          help='read config from FILE',
-                          )
+        parser.set_defaults(config=os.path.expanduser('~/.gitosis.conf'))
+        parser.add_option('--config', metavar='FILE', help='read config from FILE')
 
         return parser
 
@@ -74,17 +69,13 @@ class App(object):
     def setup_logging(self, cfg):
         try:
             loglevel = cfg.get('gitosis', 'loglevel')
-        except (ConfigParser.NoSectionError,
-                ConfigParser.NoOptionError):
+        except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
             pass
         else:
             try:
                 symbolic = logging._levelNames[loglevel]
             except KeyError:
-                log.warning(
-                    'Ignored invalid loglevel configuration: %r',
-                    loglevel,
-                    )
+                log.warning('Ignored invalid loglevel configuration: %r', loglevel)
             else:
                 logging.root.setLevel(symbolic)
 
